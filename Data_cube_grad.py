@@ -10,7 +10,12 @@ right and working counter-clockwise.
 
 import numpy as np
 
-M = np.array([[1,2,3],[1,1,1],[3,4,5]]) # Core matrix
+tensor = np.load('RRCC_gulch.npy')
+
+print(tensor[0][0][0])
+M = np.transpose(tensor)[2][:] # Core matrix
+
+M = np.transpose(M)
 Shell = np.zeros((np.shape(M)[0] + 2,np.shape(M)[1] + 2)) # Shell martix
 
 # Empty delta collection
@@ -44,7 +49,7 @@ while k < 9:
             k = k + 1
 
             # Make delta vector [Row,Column, (8 changes)]
-            Delta_Vectors[k-1] = [i,j,G1,G2,G3,G4,G5,G6,G7,G8]
+            Delta_Vectors[k-1] = [tensor[0][0][0],tensor[0][0][1],G1,G2,G3,G4,G5,G6,G7,G8]
 
             j = j + 1
 
