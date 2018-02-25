@@ -18,15 +18,15 @@ def googleElevReq():
         n = 0 # Columns
         while m < (np.shape(parallelRange)[0]): # Iterate through rows
             n = 0 # Reset column count
-            while n < (np.shape(meridianRange)[0]): # Iterate through columns
+            while n < ((np.shape(meridianRange)[0])): # Iterate through columns
                 datacube[m][n][1] = meridianRange[n]
                 datacube[m][n][0] = parallelRange[m]
-                long = str(meridianRange[m]) # Prepare iterative requests to...
-                lat = str(parallelRange[n]) # google's API
-                Make request for elevation data
-                response = urllib.request.urlopen("https://maps.googleapis.com/maps/api/elevation/json?locations=" + str(lat) + "," + str(long) + "&key=AIzaSyCehLK-fJxEZbT9Zej6kKLk8pTAz_iXkp8")
+                lon = str(meridianRange[n]) # Prepare iterative requests to...
+                lat = str(parallelRange[m]) # google's API
+                # Make request for elevation data
+                response = urllib.request.urlopen("https://maps.googleapis.com/maps/api/elevation/json?locations=" + str(lat) + "," + str(lon) + "&key=AIzaSyCehLK-fJxEZbT9Zej6kKLk8pTAz_iXkp8")
                 data = simplejson.load(response)
-                datacube[m][n][2] = 3 # data["results"][0]["elevation"]
+                datacube[m][n][2] = data["results"][0]["elevation"]
                 n = n + 1
             m = m + 1
         np.save(str(input("region name:")), datacube)
