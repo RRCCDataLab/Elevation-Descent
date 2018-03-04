@@ -56,3 +56,5 @@ while k < 9:
         i = i + 1
 
 print(Delta_Vectors)
+
+np.save(str(input("region name:")+"_grad"), Delta_Vectors)
