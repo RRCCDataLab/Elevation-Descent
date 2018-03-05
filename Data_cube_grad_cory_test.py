@@ -7,10 +7,10 @@ elevTensor = np.load('RRCC_gulch.npy')
 # Strips core matrix from elevTensor
 elevMatrix = np.transpose(np.transpose(elevTensor)[2][:])
 
-numElevMatrixRows = np.shape(elevMatrix)[0]
-numElevMatrixCols = np.shape(elevMatrix)[1]
+numElevMatrixRows = np.shape(elevMatrix)[0] # Number of rows
+numElevMatrixCols = np.shape(elevMatrix)[1] # Number of columns
 
-# Create shell matrix
+# Create shell matrix. 
 shellMatrix = np.full(((numElevMatrixRows + 2), (numElevMatrixCols + 2)), -50000.0, dtype=float)
 
 # Put the shellMatrix around the core matrix
@@ -41,6 +41,7 @@ while row <= numElevMatrixRows + 1:
             GNW = shellMatrix[row][column] - shellMatrix[row-1][column-1] #Diagonal Up Left
             gradList = [GN, GNE, GE, GSE, GS, GSW, GW, GNW]
             gradTensor[row-1][column-1][height] = gradList[height+3]
+            height += 1
         column += 1
     row += 1
 
