@@ -32,11 +32,11 @@ while i < 4 :
 
 # Take all the differences
 k = 0 # Index for all the entries in the matrix
-i = 1 # Row counter
-while k < 9:
-    while i < 4 :
-        j = 1 # Column counter
-        while j < 4:
+i = 1 # Row counter (Start at 1 so that we are in the core not the shell)
+while k < (np.shape(M)[0]*np.shape(M)[1]):
+    while i < np.shape(M)[0] + 1:
+        j = 1 # Column counter (Start at 1 so that we are in the core and not the shell)
+        while j < np.shape(M)[1] + 1:
             G1 = Shell[i][j] - Shell[i][j+1] #Right
             G2 = Shell[i][j] - Shell[i-1][j+1] #Diagonal Up Right
             G3 = Shell[i][j] - Shell[i-1][j] #Up Center
@@ -50,7 +50,7 @@ while k < 9:
 
             # Make delta vector [Row,Column, (8 changes)]
             Delta_Vectors[k-1] = [tensor[0][0][0],tensor[0][0][1],G1,G2,G3,G4,G5,G6,G7,G8]
-
+                        
             j = j + 1
 
         i = i + 1
