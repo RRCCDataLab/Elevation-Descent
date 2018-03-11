@@ -2,6 +2,9 @@ import numpy as np
 import urllib.request
 import simplejson
 
+np.load('RRCC_Gulch_original_grad.npy')
+np.load('RRCC_Gulch_CoryTest_grad.npy')
+
 
 def region():
     topLeftLatLon = (float(input("top left latitude:")), float(input("top left longitude:")))
