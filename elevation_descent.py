@@ -1,7 +1,7 @@
 import numpy as np
 import urllib.request
 import simplejson
-
+''' V  Adam, see these results  V '''
 np.load('RRCC_Gulch_original_grad.npy')
 np.load('RRCC_Gulch_CoryTest_grad.npy')
 
