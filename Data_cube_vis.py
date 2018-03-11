@@ -11,7 +11,6 @@ elevDataMatrix = np.transpose(np.transpose(elevDataCube)[2][:])
 elevDF = pd.DataFrame(data=elevDataMatrix)
 
 
-
 # Read data from a csv
 z_data = elevDF
 
@@ -23,8 +22,8 @@ data = [
 layout = go.Layout(
     title='RRCC Gulch',
     autosize=False,
-    width=500,
-    height=500,
+    width=1000,
+    height=1000,
     margin=dict(
         l=65,
         r=50,
