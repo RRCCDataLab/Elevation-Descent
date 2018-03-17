@@ -28,13 +28,22 @@ for lat, lon in latLonTuples:
 terrainDF = pd.DataFrame({'Elevations' : elevationList}, index=latLonIndex)
 
 terrainDF
+j = 0
+K = [j]
+for i in range(5):
+    K = K + [j+10]
+
+K
 
 
 
-''' UNDER CONTRUCTION
+terrainDF.iloc[[0,10,20,30],:]
+
+
+|''' UNDER CONTRUCTION
 terrainDF.index
 
-len(terrainDF.index.levels[0])
+sizeOfARow = len(terrainDF.index.levels[0])
 
 GS = pd.Series
 
