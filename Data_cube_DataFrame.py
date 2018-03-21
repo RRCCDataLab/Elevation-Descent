@@ -16,6 +16,7 @@ longitudeRange = list(np.arange(topLeftLatLon[1], botRightLatLon[1], (1/20000)))
 # Create MultiIndex for DataFrame
 latLonArrs = [latitudeRange, longitudeRange]
 latLonTuples = list(itertools.product(latitudeRange, longitudeRange))
+
 latLonIndex = pd.MultiIndex.from_tuples(latLonTuples, names=['Latitude', 'Longitude'])
 
 elevationList = []
