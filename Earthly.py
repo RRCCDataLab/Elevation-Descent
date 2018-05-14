@@ -113,7 +113,7 @@ class Region:
 
     '''Creates a surface plot of the self.Elev data as an html file'''
     def ElevVis(self):
-        name = str(input("plot name:"))
+        #name = str(input("plot name:"))
 
         z_data = self.Elev
 
@@ -126,7 +126,7 @@ class Region:
             )
         ]
         layout = go.Layout(
-            title=name,
+            title="NTable",
             autosize=False,
             width=1000,
             height=1000,
@@ -138,5 +138,4 @@ class Region:
             )
         )
         fig = go.Figure(data=data, layout=layout)
-        offline.plot(fig, filename=(name + ".html")
-
+        offline.plot(fig, filename=("Ntable" + ".html"))
