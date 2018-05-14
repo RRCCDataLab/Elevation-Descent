@@ -28,7 +28,8 @@ def meridianDistance(lat1, lon1, lat2, lon2):
     c = 2 * atan2(sqrt(a), sqrt(1 - a))
     meridian_distance = R * c
     return meridian_distance
-
+    
+# FIXME make raising layer exceptions into functions
 layer_exception = Exception("Coordinate layer must be populated before additional layers can be stacked")
 
 class Region:
@@ -87,11 +88,23 @@ class Region:
         coordMatrix = pd.DataFrame(latLonList2D)
         self.Coords = self.Coords.append(coordMatrix)
 
-    '''Creates a pandas DataFrame of the 2 dimensional elevation array for the region'''
-    def add_ElevLayer(self):
-        # If coordinate layer hasn't been populated, throw error
+    '''Scales a layer so that each cell is one distance unit apart and data accuracy is explicit'''
+    def scale_ElevLayer(self):
+        # If coordinate layer hasn't been populated, raise exception
         if self.Coords.empty:
             raise layer_exception
+
+        elev_array = self.Elev.as_matrix()
+        elev_array = np.repeat(elev_array, self.stepSize, axis=0)
+        elev_array = np.repeat(elev_array, self.stepSize, axis=1)
+        self.Elev = pd.DataFrame(elev_array)
+
+    '''Creates a pandas DataFrame of the 2 dimensional elevation array for the region'''
+    def add_ElevLayer(self):
+        # If coordinate layer hasn't been populated, raise exception
+        if self.Coords.empty:
+            raise layer_exception
+
         # Cycle through Coord layer to request elevations from Google's API
         row = 0
         elevList2D = []
@@ -116,20 +129,21 @@ class Region:
 
     '''Creates a surface plot of the self.Elev data as an html file'''
     def ElevVis(self):
-        #name = str(input("plot name:"))
+        # If coordinate layer hasn't been populated, raise exception
+        if self.Coords.empty:
+            raise layer_exception
+
+        name = str(input("plot name:"))
 
         z_data = self.Elev
 
         data = [
             go.Surface(
                 z=z_data.as_matrix()
-                # FIXME graph isn't scaling to account for stepsize
-                #x=x*self.stepSize
-                #y=y*self.stepSize
             )
         ]
         layout = go.Layout(
-            title="NTable",
+            title=name,
             autosize=False,
             width=1000,
             height=1000,
@@ -141,4 +155,4 @@ class Region:
             )
         )
         fig = go.Figure(data=data, layout=layout)
-        offline.plot(fig, filename=("Ntable" + ".html"))
+        offline.plot(fig, filename=(name + ".html"))
