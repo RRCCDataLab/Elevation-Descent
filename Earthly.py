@@ -29,6 +29,7 @@ def meridianDistance(lat1, lon1, lat2, lon2):
     meridian_distance = R * c
     return meridian_distance
 
+layer_exception = Exception("Coordinate layer must be populated before additional layers can be stacked")
 
 class Region:
 
@@ -87,8 +88,10 @@ class Region:
         self.Coords = self.Coords.append(coordMatrix)
 
     '''Creates a pandas DataFrame of the 2 dimensional elevation array for the region'''
-    # FIXME add error message if self.Coords doesn't yet exist
     def add_ElevLayer(self):
+        # If coordinate layer hasn't been populated, throw error
+        if self.Coords.empty:
+            raise layer_exception
         # Cycle through Coord layer to request elevations from Google's API
         row = 0
         elevList2D = []
