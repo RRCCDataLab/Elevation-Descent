@@ -7,6 +7,7 @@ import plotly.offline as offline
 import plotly.plotly as py
 import plotly.graph_objs as go
 from math import sin, cos, sqrt, atan2, radians
+from http import client
 
 
 def parallelDistance(lat1, lat2):
@@ -29,6 +30,15 @@ def meridianDistance(lat1, lon1, lat2, lon2):
     meridian_distance = R * c
     return meridian_distance
     
+def USGS10mElev(lat,lon):
+    usgs = client.HTTPConnection('ned.usgs.gov')
+    usgs.request('GET','/epqs/pqs.php?x=%.6f&y=%.6f&units=FEET&output=xml'% (lon, lat))
+    result = usgs.getresponse()
+    xml = result.read()
+    if result.status == 200:
+        return float(xml[xml.find(b'<Elevation>')+11:xml.find(b'</Elevation>')-1])
+    else: return xml
+
 # FIXME make raising layer exceptions into functions
 layer_exception = Exception("Coordinate layer must be populated before additional layers can be stacked")
 
@@ -94,7 +104,7 @@ class Region:
         if self.Coords.empty:
             raise layer_exception
 
-        elev_array = self.Elev.as_matrix()
+        elev_array = self.Elev.values
         elev_array = np.repeat(elev_array, self.stepSize, axis=0)
         elev_array = np.repeat(elev_array, self.stepSize, axis=1)
         self.Elev = pd.DataFrame(elev_array)
@@ -112,13 +122,16 @@ class Region:
             column = 0
             rowList = []
             while column < self.Coords.shape[1]:
-                lat = str(self.Coords.iloc[row][column][0])
-                lon = str(self.Coords.iloc[row][column][1])
+                lat = (self.Coords.iloc[row][column][0])
+                lon = (self.Coords.iloc[row][column][1])
 
+                '''
                 # Make request to Google API for elevation data
                 response = urllib.request.urlopen("https://maps.googleapis.com/maps/api/elevation/json?locations=" + lat + "," + lon + "&key=AIzaSyCehLK-fJxEZbT9Zej6kKLk8pTAz_iXkp8")
                 responseData = simplejson.load(response)
                 rowList += [responseData["results"][0]["elevation"]]
+                '''
+                rowList += [USGS10mElev(lat, lon)]
                 column += 1            
             elevList2D += [rowList]
             row += 1
@@ -139,7 +152,7 @@ class Region:
 
         data = [
             go.Surface(
-                z=z_data.as_matrix()
+                z=z_data.values
             )
         ]
         layout = go.Layout(
