@@ -30,6 +30,16 @@ def meridianDistance(lat1, lon1, lat2, lon2):
     meridian_distance = R * c
     return meridian_distance
     
+def haversine(lat1, lon1, lat2, lon2):
+    # Calculate the distance of the meridian span
+    R = 6373.0 # approximate radius of earth in km
+    dlon = abs(lon2 - lon1)
+    dlat = abs(lat2 - lat1)
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    meridian_distance = R * c
+    return meridian_distance
+
 def USGS10mElev(lat,lon):
     usgs = client.HTTPConnection('ned.usgs.gov')
     usgs.request('GET','/epqs/pqs.php?x=%.6f&y=%.6f&units=FEET&output=xml'% (lon, lat))
@@ -55,7 +65,8 @@ class Region:
         self.Coords = pd.DataFrame()
         self.Elev = pd.DataFrame()
 
-    '''Creates a pandas DataFrame of the latitude/longitude coordinates for the region. Step Size (stepSize) is in meters (great circle.)'''
+    # Creates a pandas DataFrame of the latitude/longitude coordinates for the
+    # region. Step Size (stepSize) is in meters (great circle.)
     def add_CoordLayer(self, stepSize):
         self.stepSize = stepSize
 
@@ -98,8 +109,11 @@ class Region:
         coordMatrix = pd.DataFrame(latLonList2D)
         self.Coords = self.Coords.append(coordMatrix)
 
-    '''Scales a layer so that each cell is one distance unit apart and data accuracy is explicit'''
-    def scale_ElevLayer(self):
+    # Scales a layer so that each cell is one distance unit apart and data
+    # accuracy is explicit
+    # TODO make sure querys are located at USGS data points
+    # TODO make seperate attribute for each elevLayer type
+    def block_ElevLayer(self):
         # If coordinate layer hasn't been populated, raise exception
         if self.Coords.empty:
             raise layer_exception
@@ -109,7 +123,8 @@ class Region:
         elev_array = np.repeat(elev_array, self.stepSize, axis=1)
         self.Elev = pd.DataFrame(elev_array)
 
-    '''Creates a pandas DataFrame of the 2 dimensional elevation array for the region'''
+    # Creates a pandas DataFrame of the 2 dimensional elevation array for the region
+    # TODO create seperate function for Google query, then a master function w kwarg for source
     def add_ElevLayer(self):
         # If coordinate layer hasn't been populated, raise exception
         if self.Coords.empty:
@@ -125,12 +140,11 @@ class Region:
                 lat = (self.Coords.iloc[row][column][0])
                 lon = (self.Coords.iloc[row][column][1])
 
-                '''
+                
                 # Make request to Google API for elevation data
-                response = urllib.request.urlopen("https://maps.googleapis.com/maps/api/elevation/json?locations=" + lat + "," + lon + "&key=AIzaSyCehLK-fJxEZbT9Zej6kKLk8pTAz_iXkp8")
-                responseData = simplejson.load(response)
-                rowList += [responseData["results"][0]["elevation"]]
-                '''
+                # response = urllib.request.urlopen("https://maps.googleapis.com/maps/api/elevation/json?locations=" + lat + "," + lon + "&key=AIzaSyCehLK-fJxEZbT9Zej6kKLk8pTAz_iXkp8")
+                # responseData = simplejson.load(response)
+                # rowList += [responseData["results"][0]["elevation"]]
                 rowList += [USGS10mElev(lat, lon)]
                 column += 1            
             elevList2D += [rowList]
@@ -140,7 +154,7 @@ class Region:
         elevMatrix = pd.DataFrame(elevList2D)
         self.Elev = self.Elev.append(elevMatrix)
 
-    '''Creates a surface plot of the self.Elev data as an html file'''
+    # Creates a surface plot of the self.Elev data as an html file
     def ElevVis(self):
         # If coordinate layer hasn't been populated, raise exception
         if self.Coords.empty:
