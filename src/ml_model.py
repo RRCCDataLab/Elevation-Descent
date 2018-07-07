@@ -27,7 +27,6 @@ class MLModel(subregion.SubRegion):
         # Class attributes
         self.model_path = '../curve_fitting/models/'
         self.model_file_name = str(input('Keras model file name: '))
-        print(self.model_path + self.model_file_name)
         self.model = self.__load_model()
         self.training_data_path = '../data/training_data'
         self.training_data_file_name = str(input('Training data file name: '))

@@ -22,17 +22,18 @@ class MLModel(subregion.SubRegion):
             NW_corner, SE_corner parameters are lat/lon tuples
 	'''
         # Instantiate Region superclass
-	subregion.SubRegion.__init__(self, NW_corner, SE_corner, data=data, **kwargs)
-	sub = subregion.SubRegion(NW_corner, SE_corner, data=data)
+        subregion.SubRegion.__init__(self, NW_corner, SE_corner, data=data, **kwargs)
+        sub = subregion.SubRegion(NW_corner, SE_corner, data=data)
         # Class attributes
-        self.model_path = './models/'
-        self.model_file_name = input('Keras model file name: ')
+        self.model_path = '../curve_fitting/models/'
+        self.model_file_name = str(input('Keras model file name: '))
+        print(self.model_path + self.model_file_name)
         self.model = self.__load_model()
         self.training_data_path = '../data/training_data'
-        self.training_data_file_name = input('Training data file name: ')
+        self.training_data_file_name = str(input('Training data file name: '))
         self.training_data = self.__load_training_data()
         self.validation_data_path = '../data/validation_data'
-        self.validation_data_file_name = input('Validation data file name: ')
+        self.validation_data_file_name = str(input('Validation data file name: '))
         self.validation_data = self.np.load( self.validation_data_path + self.validation_data_file_name )
         self.LAT_ARR_TRAIN = self.training_data[:,0]
         self.LON_ARR_TRAIN= self.training_data[:,1]
@@ -40,7 +41,7 @@ class MLModel(subregion.SubRegion):
         self.LAT_MIN_TRAIN= self.LAT_ARR[0]
         self.LAT_MAX_TRAIN = self.LAT_ARR[-1]
         self.LON_MIN_TRAIN = self.LON_ARR[0]
-        self.LON_MAX_TRAIN = np.amax(self.LON_ARR[-1]
+        self.LON_MAX_TRAIN = np.amax(self.LON_ARR[-1])
         self.ELEV_MIN_TRAIN = np.amin(self.ELEV_ARR)
         self.ELEV_MAX_TRAIN = np.amax(self.ELEV_ARR)
         self.LAT_ARR_NORM_TRAIN = self.__normalize_array('lat', 'train')
@@ -236,15 +237,15 @@ class MLModel(subregion.SubRegion):
     def surface_to_df(self, lat_arr, lon_arr):
         
         # Query surface for elevation at all grid locations
-        2d_elev_list = []
+        elev_list_2D = []
         for col in lon_arr:
             row_list = []
             for row in lat_arr:
                 elev = self.test_one(row, col)
-            2d_elev_list += row_list
+            elev_list_2D += row_list
     
         # Contruct DataFrame with results
-        return pd.DataFrame(2d_elev_list, index=lat_arr, columns=lon_arr)
+        return pd.DataFrame(elev_list_2D, index=lat_arr, columns=lon_arr)
 
 
     # METHODS FOR ML ARCHITECT EVALUATION OF MLMODEL CLASS
