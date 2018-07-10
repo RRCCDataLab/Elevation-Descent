@@ -15,8 +15,7 @@ class SubRegion(region.Region):
         '''
             NW_corner, SE_corner parameters are lat/lon tuples
         '''
-        region.Region.__init__(self, NW_corner[0], NW_corner[1], data=data, **kwargs)
-        reg = region.Region(NW_corner[0], NW_corner[1], data=data)
-        self.elev = reg.slice_subregion(NW_corner, SE_corner)
+        self.Region = region.Region(NW_corner[0], NW_corner[1], data=data)
+        self.elev = self.Region.slice_subregion(NW_corner, SE_corner)
         self.LAT_ARR = self.elev.index.values.astype(float)
         self.LON_ARR = self.elev.columns.values.astype(float)
