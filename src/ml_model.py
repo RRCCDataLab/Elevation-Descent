@@ -15,6 +15,8 @@ from keras.models import load_model
 import subregion
 import ml_model_utils
 
+import pdb
+
 class MLModel(subregion.SubRegion):
     '''
         For evaluating and studying terrain surface interpolation ML models
@@ -81,9 +83,14 @@ class MLModel(subregion.SubRegion):
         self.LAT_ARR_NORM_VALIDATE = self.__normalize_axarray('lat', 'validate')
         self.LON_ARR_NORM_VALIDATE = self.__normalize_axarray('lon', 'validate')
         self.ELEV_ARR_NORM_VALIDATE = self.__normalize_axarray('elev', 'validate')
+        
+        # Build model geo-grid
+        sub = self.SubRegion
+        model_lat_array = np.linspace(sub.LAT_ARR[0], sub.LAT_ARR[-1], sub.LAT_ARR.shape[0] * 10)
+        model_lon_array = np.linspace(sub.LON_ARR[0], sub.LON_ARR[-1], sub.LON_ARR.shape[0] * 10)
 
         # Results
-        self.elev = self.surface_to_df(self.SubRegion.LAT_ARR, self.SubRegion.LON_ARR)
+        self.elev = self.surface_to_df(model_lat_array, model_lon_array)
 
     # BACKEND METHODS TO MLMODEL CLASS ----------------------------------[
 
@@ -298,9 +305,11 @@ class MLModel(subregion.SubRegion):
     def test_one(self, test_lat, test_lon):
         norm_test_lat = self.__normalize_axval(test_lat, 'lat', 'train')
         norm_test_lon = self.__normalize_axval(test_lon, 'lon', 'train')
-        norm_elev = self.model.predict(np.array([[norm_test_lat, norm_test_lon]]))
+        #norm_elev = self.model.predict(np.array([[norm_test_lat, norm_test_lon]]))
+        elev = self.model.predict(np.array([[norm_test_lat, norm_test_lon]]))
         # NOTE suspect maybe not normalized
-        return self.__denormalize_axval(norm_elev, 'elev', 'train')
+        #return self.__denormalize_axval(norm_elev, 'elev', 'train')
+        return elev
 
     def batch_test(self):
         all_raw_training_data = self.training_data
