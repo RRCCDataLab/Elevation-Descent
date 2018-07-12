@@ -1,4 +1,6 @@
 import numpy as np
+import sys
+
 from keras.models import Sequential
 from keras import optimizers
 from keras.layers.core import Dense, Activation, Dropout, Lambda
@@ -9,11 +11,18 @@ from mpl_toolkits.mplot3d import Axes3D
 from keras import regularizers
 from datetime import datetime
 
-# Read in all the data
-all_data_raw = np.load('./data/theM_10m_3.npy') 
 
-#all_data_raw = np.genfromtxt('./data/theM_10m.csv')
-#print(np.shape(all_data_raw))
+sys.path.append('../src')
+import file_name_utils 
+
+ID = sys.argv[1]
+EPOCH_NUM = int(sys.argv[2])
+
+# Read in all the data
+all_data_raw = np.load('../data/training_data/theM_10m_3.npy') 
+
+# all_data_raw = np.genfromtxt('./data/theM_10m.csv')
+# print(np.shape(all_data_raw))
 
 # Cut the elevations that are too low
 all_data = []
@@ -28,24 +37,24 @@ for i in range(np.shape(all_data_raw)[0]):
 all_data = np.array(all_data)
 
 # Make raw x_train
-x_train = all_data[:,:2]
+x_train = all_data[:, :2]
 
 # Normalize x_train
-x_train_lat = (all_data[:,0:1] - np.min(all_data[:,0:1]))/(np.max(all_data[:,0:1]) -  np.min(all_data[:,0:1])) 
-x_train_long = (all_data[:,1:2] - np.min(all_data[:,1:2]))/(np.max(all_data[:,1:2]) -  np.min(all_data[:,1:2]))
+x_train_lat = (all_data[:, 0:1] - np.min(all_data[:, 0:1]))/(np.max(all_data[:, 0:1]) -  np.min(all_data[:, 0:1])) 
+x_train_long = (all_data[:, 1:2] - np.min(all_data[:, 1:2]))/(np.max(all_data[:, 1:2]) -  np.min(all_data[:, 1:2]))
 
 # Bring all of x_train together.
-x_train = np.append(x_train_lat, x_train_long, axis = 1)                
+x_train = np.append(x_train_lat, x_train_long, axis=1)                
 
 # Make high resolution data.
-high_res = np.arange(0,1,.01)
+high_res = np.arange(0, 1, .01)
 
-high_res_mesh  = []
+high_res_mesh = []
 for j in range(np.shape(high_res)[0]):
     x = high_res[j]
     for k in range(np.shape(high_res)[0]):
         y = high_res[k]    
-        high_res_mesh.append([x,y])
+        high_res_mesh.append([x, y])
         
 
 high_res_mesh = np.asarray(high_res_mesh)
@@ -83,10 +92,13 @@ adam = optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=.1, decay=0.0,
 model.compile(loss='mae', optimizer=adam)
 
 # Run the model
-model.fit(x_train, z, nb_epoch=20000)
+model.fit(x_train, z, nb_epoch=EPOCH_NUM)
+
+# Running Cory's custom namer
+name = file_name_utils.get_file_name(ID, str(EPOCH_NUM), filetype="model") 
 
 # Save the model
-model.save('./models/elevation_model_real_data' + datetime.now().strftime('%Y-%m-%d_%H:%M:%S')  + '.h5')
+model.save("../data/models/" + name)
 
 # Make the prediction data for the points between the given information.
 z_predicted = model.predict(x_train)
