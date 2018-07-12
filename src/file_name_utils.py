@@ -38,6 +38,6 @@ def get_file_name(unique_code, more_info, filetype=None):
     else:
         raise Exception("invalid filetype keyword")
 
-    return "%s_%s_%s_%s_%s" % (unique_code, data_type,
+    return "%s_%s_%s_%s%s" % (unique_code, data_type,
                             more_info, date, file_ext)
 
