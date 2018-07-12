@@ -17,7 +17,7 @@ def get_file_name(unique_code, more_info, filetype=None):
                                                 'validation_data', and 'model'
     '''
     # 2 digit code for pairing a model with it's training/validation data
-    month = datetime.date.today().strftime("%B")[0:3]
+    month = datetime.date.today().strftime("%B")[0:3].lower()
     day = datetime.date.today().strftime("%d")
     # make day 03 instead of 3
     if len(day) == 1: day = '0' + day
