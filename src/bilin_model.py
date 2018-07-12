@@ -19,7 +19,7 @@ class BilinModel(subregion.SubRegion):
 	'''
         self.SubRegion = subregion.SubRegion(NW_corner, SE_corner, data=data)
         X = self.SubRegion.LON_ARR # array of longitude vals W > E
-        Y = self.SubRegion.LAT_ARR #NOTE undone > flipped to accomadate builtin interp method
+        Y = self.SubRegion.LAT_ARR # array of latitude vals N > S
         Z = self.SubRegion.elev.values # elevation vals as a 2d array
 
         # Build the function for bilinear interpolation
@@ -31,6 +31,6 @@ class BilinModel(subregion.SubRegion):
 
         # Get bilin interpolated 2d array from function
         z_bilin = newfunc(xnew, ynew)
-        self.LAT_ARR = np.flip(ynew, 0) # flip y axis back after interpolation
+        self.LAT_ARR = np.flip(ynew, 0) # flip y axis after interpolation
         self.LON_ARR = xnew
         self.elev = pd.DataFrame(z_bilin, index=self.LAT_ARR, columns=self.LON_ARR)

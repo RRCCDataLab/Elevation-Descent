@@ -31,7 +31,7 @@ class MLModel(subregion.SubRegion):
 
         # Class attributes
         # Model Data
-        self.model_path = '../curve_fitting/models/'
+        self.model_path = '../data/models/'
         # TODO add failsafes for all input prompts
         self.model_file_name = str(input('Keras model file name: '))
         self.model = self.__load_model()
@@ -276,8 +276,10 @@ class MLModel(subregion.SubRegion):
                 row_list += [elev]
             elev_list_2D += [row_list]
 
+            lat_arr_flip = np.flip(lat_arr, 0)
+
         # Contruct DataFrame with results
-        return pd.DataFrame(elev_list_2D, index=lat_arr, columns=lon_arr)
+        return pd.DataFrame(elev_list_2D, index=lat_arr_flip, columns=lon_arr)
 
 
     # METHODS FOR ML ARCHITECT EVALUATION OF MLMODEL CLASS --------------------
