@@ -1,14 +1,22 @@
+'''
+Author: Adam Forland Data_Lab @ Red Rocks Community College
+'''
+
 import numpy as np
 import sys
+from matplotlib import pyplot as plt
+from matplotlib import cm
+import yaml
 
+from keras.models import model_from_yaml
+from keras import regularizers
+from mpl_toolkits.mplot3d import Axes3D
 from keras.models import Sequential
 from keras import optimizers
 from keras.layers.core import Dense, Activation, Dropout, Lambda
-from matplotlib import pyplot as plt
-from matplotlib import cm
-from itertools import product 
-from mpl_toolkits.mplot3d import Axes3D
 from keras import regularizers
+
+from itertools import product 
 from datetime import datetime
 
 
@@ -17,12 +25,14 @@ import file_name_utils
 
 ID = sys.argv[1]
 EPOCH_NUM = int(sys.argv[2])
+arch = sys.argv[3]
+
+# Load the model from storage
+yaml_model = open('../data/architectures/' + arch + '.yml', "r+").read()
+model = model_from_yaml(yaml_model)
 
 # Read in all the data
 all_data_raw = np.load('../data/training_data/theM_10m_3.npy') 
-
-# all_data_raw = np.genfromtxt('./data/theM_10m.csv')
-# print(np.shape(all_data_raw))
 
 # Cut the elevations that are too low
 all_data = []
@@ -32,8 +42,7 @@ for i in range(np.shape(all_data_raw)[0]):
     else:
         all_data.append(all_data_raw[i])
 
-# Make the new all_data without the 
-# low points
+# Make the new all_data without the low points
 all_data = np.array(all_data)
 
 # Make raw x_train
@@ -56,33 +65,10 @@ for j in range(np.shape(high_res)[0]):
         y = high_res[k]    
         high_res_mesh.append([x, y])
         
-
 high_res_mesh = np.asarray(high_res_mesh)
-print(np.shape(x_train))
-print(np.shape(high_res_mesh))
-
-
 
 # Normalize z
 z = all_data[:,2:]
-# z = (z - np.min(z))/(np.max(z)-np.min(z))
-
-# Build the model 
-model = Sequential([Dense(output_dim=50, input_dim=2),
-                Activation("sigmoid") ,
-                Dense(output_dim=10, input_dim=50),
-                Activation("tanh"),
-                Dense(output_dim=10, input_dim=10),
-                Activation("tanh"),
-                Dense(output_dim=10, input_dim=10),
-                Activation("sigmoid"),
-                Dense(output_dim=10, input_dim=10),
-                Activation("relu"),
-                Dense(output_dim=10, input_dim=10),
-                Activation("relu"),
-                Dense(output_dim=1, input_dim=10),
-                Activation('relu')])
-
 
 # Optimizers
 sgd = optimizers.SGD(lr=0.01, momentum=0.5, nesterov=True)
@@ -91,26 +77,37 @@ adam = optimizers.Adam(lr=0.01, beta_1=0.9, beta_2=0.999, epsilon=.1, decay=0.0,
 # Compile the models
 model.compile(loss='mae', optimizer=adam)
 
+'''
+val = model.to_yaml()
+with open(arch + '.yml', 'w') as outfile:
+        outfile.write(val)
+'''
+
 # Run the model
 model.fit(x_train, z, nb_epoch=EPOCH_NUM)
 
 # Running Cory's custom namer
 name = file_name_utils.get_file_name(ID, str(EPOCH_NUM), filetype="model") 
 
+# Running Cory's custom namer
+name_w = file_name_utils.get_file_name(ID + '_W', str(EPOCH_NUM), filetype="model") 
+
 # Save the model
 model.save("../data/models/" + name)
+
+# Save the weights
+model.save_weights("../data/weights/" + name_w)
 
 # Make the prediction data for the points between the given information.
 z_predicted = model.predict(x_train)
 z_predicted_HR =  model.predict(high_res_mesh)
-
 
 # Plot the points and the predicted values. 
 fig = plt.figure()
 ax = fig.add_subplot(111, projection='3d')
 
 ax.scatter(x_train.T[:][0], x_train.T[:][1], z, c=z, marker='o')
-#ax.scatter(x_train.T[:][0], x_train.T[:][1], z_predicted, c=z_predicted , marker='o')
+ax.scatter(x_train.T[:][0], x_train.T[:][1], z_predicted, c='r' , marker='o')
 #ax.scatter(high_res_mesh.T[:][0], high_res_mesh.T[:][1], z_predicted_HR, c='b', marker='o')
 
 ax.set_xlabel('Latitude')
