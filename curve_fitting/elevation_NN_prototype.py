@@ -90,7 +90,7 @@ model.fit(x_train, z, nb_epoch=EPOCH_NUM)
 name = file_name_utils.get_file_name(ID, str(EPOCH_NUM), filetype="model") 
 
 # Running Cory's custom namer
-name_w = file_name_utils.get_file_name(ID + '__W__', str(EPOCH_NUM), filetype="model") 
+name_w = file_name_utils.get_file_name(ID + '_W', str(EPOCH_NUM), filetype="model") 
 
 # Save the model
 model.save("../data/models/" + name)
