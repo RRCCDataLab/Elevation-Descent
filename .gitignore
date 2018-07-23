@@ -1,0 +1,7 @@
+# general files to ignore
+*.com
+*.pyc
+
+# ignore raster files due to size
+*.adf
+*.tif
