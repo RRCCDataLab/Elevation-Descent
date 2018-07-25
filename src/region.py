@@ -17,26 +17,47 @@ path_to_1m_data = '/Volumes/Fleet Storage/DEM_Database/NED_1m/x47y440/USGS_NED_o
 
 #path_to_1m_data = '/mnt/e/DEM_Database/NED_1m/x48y440/USGS_NED_one_meter_x48y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
 
+path_to_raster_data = '../data/raster_data/'
+
 class Region(object):
 
-    def __init__(self, lat, lon, data='10m', **kwargs):
+    def __init__(self, lats, lons, data='10m', **kwargs):
         if data == '1m':
             # TODO: add ability to pass lat lon to get_1m_data to select various tiles
-            print('retrieving raster data...')
+            print('Retrieving raster data...')
             self.raster_data = raster_utils.get_1m_data(path_to_1m_data)
 
         elif data == '10m':
-            print('building grid reference string...')
-            self.grid_refs = raster_utils.build_grid_refs([lat], [lon])
-            print('generating file path to raster data...')
-            self.raster_path = raster_utils.get_raster_path(self.grid_refs[0])
-            print('retrieving raster data...')
-            self.raster_data = raster_utils.get_raster_data(self.raster_path)
+            print('Building grid reference string(s)...')
+            self.grid_refs = raster_utils.get_grid_refs(lats, lons)
+
+            print('Generating file path(s) to raster data...')
+            self.raster_paths = []
+            for grid_ref in self.grid_refs:
+                raster_path = raster_utils.get_raster_path(grid_ref)
+                self.raster_paths += [raster_path]
+
+            
+            print('Retrieving raster data...')
+            # Merge tiles if there are multiple
+            if (len(self.grid_refs) > 1) :
+                # Get file name of merged raster to be created
+                name_raster = raster_utils.name_raster_file
+                merged_filename = name_raster(self.grid_refs, filetype='adf')
+                # Create the merge raster
+                raster_utils.merge_rasters(self.grid_refs, self.raster_paths)
+                merged_raster_path = path_to_raster_data + merged_filename
+                # Store data from the merged raster
+                self.raster_data = raster_utils.get_raster_data(merged_raster_path)
+
+            else:
+                single_raster_path = self.raster_paths[0]
+                self.raster_data = raster_utils.get_raster_data(single_raster_path)
             
         else:
             raise Exception('invalid data source selection')
 
-        print('defining raster data parameters...')
+        print('Defining raster data parameters...')
         self.pixel_width = self.raster_data[2]
         self.pixel_height = self.raster_data[3]
         self.num_rows = self.raster_data[5]
@@ -48,19 +69,21 @@ class Region(object):
         x_offset = self.pixel_width / 2.0 # match column vals with horizontal center of pixel
         y_offset = self.pixel_height / 2.0 # match index vals with vertical center of pixel
         self.start_lat = self.N_bound + y_offset # center of first row of pixels
-        self.start_lon = self.W_bound + x_offset # center of first col of pixels
-        self.end_lat = self.start_lat + (self.pixel_height * (self.num_rows - 1)) # center of last row
-        self.end_lon = self.start_lon + (self.pixel_width * (self.num_cols - 1)) # center of last col
+        self.start_lon = self.W_bound + x_offset # center of first col of pixel
+        # center of last rows
+        self.end_lat = self.start_lat + (self.pixel_height * (self.num_rows - 1))
+        # center of last col
+        self.end_lon = self.start_lon + (self.pixel_width * (self.num_cols - 1))
         self.band = self.raster_data[4]
-        print('generating lat/lon domain arrays...')
+        print('Generating lat/lon domain arrays...')
         self.lat_array = np.linspace(self.start_lat, self.end_lat, num=self.num_rows, endpoint=True)
         self.lon_array = np.linspace(self.start_lon, self.end_lon, num=self.num_cols, endpoint=True)
-        print('storing raster data...')
+        print('Storing raster data...')
         self.elev_data = self.raster_data[7]
-        print('generating elevation DataFrame...')
+        print('Generating elevation DataFrame...')
         data = self.elev_data.ReadAsArray()
-        self.elev = pd.DataFrame(data=data, index=self.lat_array, columns=self.lon_array)
-        self.elev = self.elev * 3.280839895 # converts DF from meters to feet
+        elev = pd.DataFrame(data=data, index=self.lat_array, columns=self.lon_array)
+        self.elev = elev * 3.280839895 # converts DF from meters to feet
 
     def lat_index(self, lat):
         nearest_lat_index = region_utils.find_nearest(self.lat_array, lat)
@@ -114,7 +137,7 @@ class Region(object):
     def return_point_data(self, lat_index, lon_index):
         lon = float(self.elev.iloc[:, lon_index].name)
         lat = float(self.elev.iloc[lat_index].name)
-        elev = self.Elev.iloc[lat_index, lon_index]
+        elev = self.elev.iloc[lat_index, lon_index]
         return (lon, lat, elev)
 
     def get_points(self, lat, lon):

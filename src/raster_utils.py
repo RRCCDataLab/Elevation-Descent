@@ -13,6 +13,10 @@ import os
 import gdal
 import numpy as np
 import region_utils
+import sys
+# NOTE point the path below at your gdal installation (gdal_merge.py)
+sys.path.append('/Users/ckennedy/miniconda2/envs/tensorflow/bin/')
+import gdal_merge
 
 # XXX temporary
 # TODO: add get_path function to allow different 1m data tiles to be retrieved
@@ -25,6 +29,8 @@ path_1m_meta = '/Volumes/Fleet Storage/DEM_Database/NED_1m/x47y440/USGS_NED_one_
 #path_10m_data = '/mnt/e/DEM_Database/NED_13/grid/n40w106/grdn40w106_13/w001001.adf'
 path_10m_data = '/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n40w106/grdn40w106_13/w001001.adf'
 
+raster_data_loc = '../data/raster_data/'
+
 # TODO: add kwarg for getting 1m data path
 def get_raster_path(grid_ref):
     sub_path = 'grd' + grid_ref + '_13'
@@ -33,22 +39,22 @@ def get_raster_path(grid_ref):
     return raster_path
 
 
-def build_grid_refs(lats, lons):  # lats and lons are lists, their parameter order has been switched
+def get_grid_refs(lats, lons):  # lats and lons are lists
     grid_refs = []
 
-    for p in range(len(lons)):
-        if lats[p] > 0.0 and lons[p] < 0.0: # if lat is N and lon is W, isolate degree value and add 1
-            latVal = str(int(abs(lats[p])//1 + 1)) # twice as fast as above method
-            lonVal = str(int(abs(lons[p])//1 + 1))
+    for index in range(len(lons)):
+        if lats[index] > 0.0 and lons[index] < 0.0: # if lat is N and lon is W, isolate degree value and add 1
+            latVal = str(int(abs(lats[index])//1 + 1))
+            lonVal = str(int(abs(lons[index])//1 + 1))
 
             if len(lonVal) < 3:
-                lonVal = '0' + val # if degree val only has 2 digits, prepend 0 to front
+                lonVal = '0' + lonVal # if degree val only has 2 digits, prepend 0 to front
             grid_refs.append('n' + latVal + 'w' + lonVal) # prepend directions and stitch together
 
         else:
             grid_refs.append('0')
 
-    return grid_refs
+    return list(set(grid_refs))
 
 
 def get_elev_data(grid_ref, lats, lons): # grid_ref is a single string, from build_grid_refs(arg, arg)
@@ -116,7 +122,6 @@ def get_raster_data(raster_path):
         pixelWidth = geotransform[1]
         pixelHeight = geotransform[5]
         print('Unpacking Grid...')
-        data.ReadAsArray() #NOTE time intensive step; necessary? probably.
         cols = data.RasterXSize # number of pixel columns in raster tile
         rows = data.RasterYSize # number of pixel rows in raster tile
         bands = data.RasterCount # number of raster bands (~layers)
@@ -155,6 +160,36 @@ def return_elevation_profiles(lats, lons):
     elevation_full = np.array(elevation_full)
     return elevation_full
 
+def merge_rasters(grid_refs, raster_paths):
+    print('Finding multiple raster files...')
+    # Get file name for storage of raster files
+    txt_filename = name_raster_file(grid_refs, filetype='txt')
+    # Store the location of all the raster files to be merged
+    rasterfiles_to_txt(grid_refs, raster_paths, raster_data_loc + txt_filename)
+    # Get file name for the merged raster file
+    merged_filename = name_raster_file(grid_refs, filetype='adf')
+    # Merge the raster files; gdal_merge parses args starting at 1
+    print('Merging multiple raster files...')
+    gdal_merge.main(['', '-o', raster_data_loc + merged_filename, '-v', '--optfile',
+                    raster_data_loc + txt_filename ])
+
+def rasterfiles_to_txt(grid_refs, raster_paths, filename):
+    f = open(filename, 'w')
+
+    # Writes "path/to/raster/filename" (return) to a txt file
+    to_file = '' # intitialize empty string before appending
+    for path in raster_paths:
+        to_file += ('\"' + path + '\"' + '\n')
+
+    f.write(to_file)
+    f.close()
+
+def name_raster_file(grid_refs, filetype='txt', **kwarg):
+    file_str = '' # intitialize empty string before appending
+    for string in grid_refs:
+        file_str += string
+    file_str += '.' + filetype
+    return file_str
 
 
 # LONG TERM STORAGE

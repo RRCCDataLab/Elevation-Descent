@@ -50,6 +50,9 @@ class Trace(region.Region):
         rise_ft = self.elev[iterator] - self.elev[iterator + 1]
         rise = rise_ft / 3.280839895 # convert ft to meters
         run = trace_utils.haversine(origin, destination)
+        # Handle edge case when vehicle hasn't move (div by zero)
+        if run == 0:
+            run = .00001
         return ((rise / run) * 100)
 
     def get_grade_profile(self):
