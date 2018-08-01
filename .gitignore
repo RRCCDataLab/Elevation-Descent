@@ -9,7 +9,7 @@
 data/raster_data/*.txt
 
 # config files are system specific
-#config.py
+config.py
 
 # python specific
 */__pycache__/*
