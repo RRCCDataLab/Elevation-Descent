@@ -9,7 +9,7 @@ Modified 6/6/18 - 8/10/18
 by: Cory Kennedy
 """
 
-import os
+from os import path
 import gdal
 import numpy as np
 import region_utils
@@ -20,19 +20,19 @@ sys.path.append(config.GDAL_CONFIG['path_to_gdal_merge'])
 import gdal_merge
 
 # TODO: add get_path functionality to allow different 1m data tiles to be retrieved
-pathx47y440 = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
-path_to_1m_data = os.path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
+pathx47y440 = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
+path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
-pathx47y440_meta = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015_meta.xml')
-path_to_1m_meta = os.path.join(config.CFDS_CONFIG['path_1m_meta'], pathx47y440_meta)
+pathx47y440_meta = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015_meta.xml')
+path_to_1m_meta = path.join(config.CFDS_CONFIG['path_1m_meta'], pathx47y440_meta)
 
-path_to_raster_data = os.path.join('..', 'data', 'raster_data')
+path_to_raster_data = path.join('..', 'data', 'raster_data')
 
 # TODO: add kwarg for getting 1m data path
 def get_raster_path(grid_ref):
     sub_path = 'grd' + grid_ref + '_13'
     main_path = config.CFDS_CONFIG['path_10m_data']
-    raster_path = os.path.join((main_path + grid_ref), sub_path, 'w001001.adf')
+    raster_path = path.join((main_path + grid_ref), sub_path, 'w001001.adf')
     return raster_path
 
 
@@ -59,7 +59,7 @@ def get_elev_data(grid_ref, lats, lons): # grid_ref is a single string, from bui
     print('Retreiving Path to Raster Data...')
     raster_path = get_raster_path(grid_ref)
 
-    if not os.path.exists(raster_path): # checks if data exists
+    if not path.exists(raster_path): # checks if data exists
         elevation = [np.nan]*len(lons) # populates whole elev list with nan
         raise Exception('Incorrect FilePath to Raster Database, or data does not exist.')
 
