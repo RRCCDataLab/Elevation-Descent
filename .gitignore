@@ -9,11 +9,13 @@
 data/raster_data/*.txt
 
 # python specific
-*/__pycache__/
-*/*/__pycache__/
-*/*/*/__pycache__/
+*/__pycache__/*
+*/*/__pycache__/*
+*/*/*/__pycache__/*
 *.ipynb_checkpoints*
 *.pyc
+src/*.pyc
+*/*/*.*.pyc
 
 # mac specific
 .DS_Store
