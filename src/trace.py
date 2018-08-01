@@ -21,7 +21,9 @@ class Trace(region.Region):
         self.lats = lats
         self.lons = lons
         self.coords = list(zip(lats, lons))
+        print('Generating elevation profile')
         self.elev = self.bilin_walk()
+        print('Generating grade profile')
         self.grade = self.get_grade_profile()
 
         
@@ -47,13 +49,14 @@ class Trace(region.Region):
     def grade_to_next_point(self, iterator):
         origin = self.coords[iterator]
         destination = self.coords[iterator + 1]
-        rise_ft = self.elev[iterator] - self.elev[iterator + 1]
+        rise_ft = self.elev[iterator + 1] - self.elev[iterator]
         rise = rise_ft / 3.280839895 # convert ft to meters
         run = trace_utils.haversine(origin, destination)
-        # Handle edge case when vehicle hasn't move (div by zero)
+        # Handle edge case when vehicle hasn't moved (div by zero)
         if run == 0:
-            run = .00001
-        return ((rise / run) * 100)
+            return 0
+        else:
+            return ((rise / run) * 100)
 
     def get_grade_profile(self):
         grade_profile = []

@@ -28,15 +28,31 @@ class Region(object):
             self.raster_data = raster_utils.get_1m_data(path_to_1m_data)
 
         elif data == '10m':
-            print('Building grid reference string(s)...')
-            self.grid_refs = raster_utils.get_grid_refs(lats, lons)
 
-            print('Generating file path(s) to raster data...')
-            self.raster_paths = []
-            for grid_ref in self.grid_refs:
-                raster_path = raster_utils.get_raster_path(grid_ref)
-                self.raster_paths += [raster_path]
+            # if lats (and lons) is a list
+            # indicates child object is a Trace object
+            if isinstance(lats, list):
+                print('Building grid reference string(s)...')
+                self.grid_refs = raster_utils.get_grid_refs(lats, lons)
 
+                print('Generating file path(s) to raster data...')
+                self.raster_paths = []
+                for grid_ref in self.grid_refs:
+                    raster_path = raster_utils.get_raster_path(grid_ref)
+                    self.raster_paths += [raster_path]
+
+            # if lats (and lons) is a single element
+            # indicates child object is a SubRegion object
+            else:
+                lat = lats
+                lon = lons
+                print('building grid reference string...')
+                self.grid_refs = raster_utils.get_grid_refs([lat], [lon])
+                print('generating file path to raster data...')
+                self.raster_path = raster_utils.get_raster_path(self.grid_refs[0])
+                print('retrieving raster data...')
+                self.raster_data = raster_utils.get_raster_data(self.raster_path)
+                
             
             print('Retrieving raster data...')
             # Merge tiles if there are multiple
