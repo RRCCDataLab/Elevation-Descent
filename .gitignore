@@ -8,6 +8,9 @@
 # ignore raster combo txt files
 data/raster_data/*.txt
 
+# config files are system specific
+#config.py
+
 # python specific
 */__pycache__/*
 */*/__pycache__/*
