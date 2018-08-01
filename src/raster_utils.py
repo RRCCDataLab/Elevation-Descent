@@ -13,11 +13,11 @@ import os
 import gdal
 import numpy as np
 import region_utils
+import config
 import sys
 # NOTE point the path below at your gdal installation (gdal_merge.py)
-sys.path.append('/Users/ckennedy/miniconda2/envs/tensorflow/bin/')
+sys.path.append(config.GDAL_CONFIG['path_to_gdal_merge'])
 import gdal_merge
-import config
 
 # TODO: add get_path functionality to allow different 1m data tiles to be retrieved
 pathx47y440 = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
