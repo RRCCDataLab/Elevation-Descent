@@ -9,6 +9,7 @@
 data/raster_data/*.txt
 
 # config files are system specific
+src/config.py
 config.py
 
 # python specific
