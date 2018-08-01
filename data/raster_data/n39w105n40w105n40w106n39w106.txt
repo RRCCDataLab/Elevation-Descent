@@ -1,4 +1,0 @@
-"/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n39w105/grdn39w105_13/w001001.adf"
-"/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n40w105/grdn40w105_13/w001001.adf"
-"/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n40w106/grdn40w106_13/w001001.adf"
-"/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n39w106/grdn39w106_13/w001001.adf"
