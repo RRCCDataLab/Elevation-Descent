@@ -1,7 +1,28 @@
 # general files to ignore
 *.com
-*.pyc
 
 # ignore raster files due to size
 *.adf
 *.tif
+
+# ignore raster combo txt files
+data/raster_data/*.txt
+
+# python specific
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+*.ipynb_checkpoints*
+*.pyc
+
+# mac specific
+.DS_Store
+
+# ignore swap files
+*.swp
+
+# ignore local backups
+*.save
+
+# other
+*.swo
