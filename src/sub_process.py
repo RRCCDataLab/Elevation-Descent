@@ -3,8 +3,8 @@ import pandas as pd
 import numpy as np
 import trace
 
-username = input(str('TSDC username: '))
-password = input(str('TSDC password: '))
+username = str(input('TSDC username: '))
+password = str(input('TSDC password: '))
 hostname = 'tsdc-server'
 database = 'master'
 
@@ -20,15 +20,21 @@ FROM tsdc_txdot_san_antonio.v_points_nrel
 WHERE sampno = 301137 AND vehno = 1
 """
 
-def get_veh_tbl_df(table_name, sample_num, veh_num, tomtomgrade=True):
-    query = get_query_str(table_name, veh_num, tomtomgrade=tomtomgrade)
+# Primary subprocess function
+def write_tbl_with_grade(schema_name, table_name, sample_num, veh_num):
+    df = get_veh_tbl_df(schema_name, table_name, sample_num, veh_num)
+    # Append bi-linearly interpolated elevation and grade to the table
+    df = append_elev_and_grade(df)
+    # Write new table to the database
+    to_sql(df, schema_name, table_name+'_bilinCK')
+
+def get_veh_tbl_df(schema_name, table_name, sample_num, veh_num):
+    query = get_query_str(schema_name, table_name, sample_num, veh_num)
     return pd.read_sql(query, SQLengine)
 
-def get_query_str(tbl_name, veh_num, tomtomgrade=True):
-    SELECT = 'SELECT sampno, vehno, gpsspeed, time_rel, ST_Y(geom) AS lat, ST_X(geom) AS lon'
-    if tomtomgrade == True:
-        SELECT += '' # TODO insert column name for TomTom grade
-    FROM = '\nFROM ' + str(tbl_name)
+def get_query_str(schema_name, table_name, sample_num, veh_num):
+    SELECT = 'SELECT *, ST_Y(geom) AS lat, ST_X(geom) AS lon'
+    FROM = '\nFROM ' + str(schema_name) + '.' + str(table_name)
     WHERE = '\nWHERE sampno = ' + str(sample_num) + ' AND vehno = ' + str(veh_num)
     return SELECT + FROM + WHERE
 
@@ -51,5 +57,9 @@ def append_elev_and_grade(tbl_df):
     return tbl_df
 
 # NOTE: chunksize kwarg for df.to_sql sets batch-size for writing rows to db
-def to_sql(tbl_df, tbl_name):
-    tbl_df.to_sql(tbl_name, SQLengine, if_exists='append', index=False)
+def to_sql(tbl_df, schema_name, table_name):
+    tbl_df.to_sql(table_name, SQLengine, schema=schema_name, if_exists='append', index=False)
+
+def get_unique_veh_nums_df(schema_name, table_name):
+    query = 'SELECT DISTINCT sampno, vehno FROM ' + str(schema_name) + '.' + str(table_name)
+    return pd.read_sql(query, SQLengine)
