@@ -17,25 +17,22 @@ import sys
 # NOTE point the path below at your gdal installation (gdal_merge.py)
 sys.path.append('/Users/ckennedy/miniconda2/envs/tensorflow/bin/')
 import gdal_merge
+import config
 
-# XXX temporary
-# TODO: add get_path function to allow different 1m data tiles to be retrieved
-#path_1m_data = '/mnt/e/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
-path_1m_data = '/Volumes/Fleet Storage/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
-#path_1m_data = '/mnt/e/DEM_Database/NED_1m/x48y440/USGS_NED_one_meter_x48y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
-#path_1m_meta = '/mnt/e/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015_meta.xml'
-path_1m_meta = '/Volumes/Fleet Storage/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015_meta.xml'
-#path_1m_meta = '/mnt/e/DEM_Database/NED_1m/x48y440/USGS_NED_one_meter_x48y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015_meta.xml'
-#path_10m_data = '/mnt/e/DEM_Database/NED_13/grid/n40w106/grdn40w106_13/w001001.adf'
-path_10m_data = '/Volumes/Fleet Storage/DEM_Database/NED_13/grid/n40w106/grdn40w106_13/w001001.adf'
+# TODO: add get_path functionality to allow different 1m data tiles to be retrieved
+pathx47y440 = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
+path_to_1m_data = os.path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
-raster_data_loc = '../data/raster_data/'
+pathx47y440_meta = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015_meta.xml')
+path_to_1m_meta = os.path.join(config.CFDS_CONFIG['path_1m_meta'], pathx47y440_meta)
+
+path_to_raster_data = os.path.join('..', 'data', 'raster_data')
 
 # TODO: add kwarg for getting 1m data path
 def get_raster_path(grid_ref):
     sub_path = 'grd' + grid_ref + '_13'
-    #raster_path = '/mnt/e/DEM_Database/NED_13/grid/' + grid_ref + '/' + sub_path + '/w001001.adf'
-    raster_path = '/Volumes/Fleet Storage/DEM_Database/NED_13/grid/' + grid_ref + '/' + sub_path + '/w001001.adf'
+    main_path = config.CFDS_CONFIG['path_10m_data']
+    raster_path = os.path.join((main_path + grid_ref), sub_path, 'w001001.adf')
     return raster_path
 
 
@@ -165,13 +162,13 @@ def merge_rasters(grid_refs, raster_paths):
     # Get file name for storage of raster files
     txt_filename = name_raster_file(grid_refs, filetype='txt')
     # Store the location of all the raster files to be merged
-    rasterfiles_to_txt(grid_refs, raster_paths, raster_data_loc + txt_filename)
+    rasterfiles_to_txt(grid_refs, raster_paths, path_to_raster_data + txt_filename)
     # Get file name for the merged raster file
     merged_filename = name_raster_file(grid_refs, filetype='adf')
     # Merge the raster files; gdal_merge parses args starting at 1
     print('Merging multiple raster files...')
-    gdal_merge.main(['', '-o', raster_data_loc + merged_filename, '-v', '--optfile',
-                    raster_data_loc + txt_filename ])
+    gdal_merge.main(['', '-o', path_to_raster_data + merged_filename, '-v', '--optfile',
+                    path_to_raster_data + txt_filename ])
 
 def rasterfiles_to_txt(grid_refs, raster_paths, filename):
     f = open(filename, 'w')

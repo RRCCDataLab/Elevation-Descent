@@ -8,16 +8,15 @@
 
 import numpy as np
 import pandas as pd
+import os
 import raster_utils
 import region_utils
+import config
 
-# XXX temporary:
-#path_to_1m_data = '/mnt/e/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
-path_to_1m_data = '/Volumes/Fleet Storage/DEM_Database/NED_1m/x47y440/USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
+pathx47y440 = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
+path_to_1m_data = os.path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
-#path_to_1m_data = '/mnt/e/DEM_Database/NED_1m/x48y440/USGS_NED_one_meter_x48y440_CO_SoPlatteRiver_Lot5_2013_IMG_2015.img'
-
-path_to_raster_data = '../data/raster_data/'
+path_to_raster_data = os.path.join('..', 'data', 'raster_data')
 
 class Region(object):
 
