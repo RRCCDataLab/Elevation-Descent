@@ -22,7 +22,9 @@ class Trace(region.Region):
         self.lons = lons
         self.coords = list(zip(lats, lons))
         print('Generating elevation profile')
-        self.elev = self.bilin_walk() * 3.280839895 # Convert results to feet
+        self.elev_m = self.bilin_walk()
+        # Convert results to meters
+        self.elev = [i * 3.280839895 for i in self.elev_m]
         print('Generating grade profile')
         self.grade = self.get_grade_profile()
 
@@ -50,7 +52,7 @@ class Trace(region.Region):
         origin = self.coords[iterator]
         destination = self.coords[iterator + 1]
         # Both rise and run are in meters
-        rise = self.elev[iterator + 1] - self.elev[iterator]
+        rise = self.elev_m[iterator + 1] - self.elev_m[iterator]
         run = trace_utils.haversine(origin, destination)
         # Handle edge case when vehicle hasn't moved (div by zero)
         if run == 0:
