@@ -8,15 +8,15 @@
 
 import numpy as np
 import pandas as pd
-import os
+from os import path
 import raster_utils
 import region_utils
 import config
 
-pathx47y440 = os.path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
-path_to_1m_data = os.path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
+pathx47y440 = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
+path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
-path_to_raster_data = os.path.join('..', 'data', 'raster_data')
+path_to_raster_data = path.join('..', 'data', 'raster_data')
 
 class Region(object):
 
@@ -61,7 +61,7 @@ class Region(object):
                 merged_filename = name_raster(self.grid_refs, filetype='adf')
                 # Create the merge raster
                 raster_utils.merge_rasters(self.grid_refs, self.raster_paths)
-                merged_raster_path = path_to_raster_data + merged_filename
+                merged_raster_path = path.join(path_to_raster_data, merged_filename)
                 # Store data from the merged raster
                 self.raster_data = raster_utils.get_raster_data(merged_raster_path)
 
