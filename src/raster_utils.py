@@ -32,7 +32,7 @@ path_to_raster_data = path.join('..', 'data', 'raster_data')
 def get_raster_path(grid_ref):
     sub_path = 'grd' + grid_ref + '_13'
     main_path = config.CFDS_CONFIG['path_10m_data']
-    raster_path = path.join((main_path + grid_ref), sub_path, 'w001001.adf')
+    raster_path = path.join(main_path, grid_ref, sub_path, 'w001001.adf')
     return raster_path
 
 
