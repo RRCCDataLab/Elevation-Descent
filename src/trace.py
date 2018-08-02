@@ -22,7 +22,7 @@ class Trace(region.Region):
         self.lons = lons
         self.coords = list(zip(lats, lons))
         print('Generating elevation profile')
-        self.elev = self.bilin_walk()
+        self.elev = self.bilin_walk() * 3.280839895 # Convert results to feet
         print('Generating grade profile')
         self.grade = self.get_grade_profile()
 
@@ -49,8 +49,8 @@ class Trace(region.Region):
     def grade_to_next_point(self, iterator):
         origin = self.coords[iterator]
         destination = self.coords[iterator + 1]
-        rise_ft = self.elev[iterator + 1] - self.elev[iterator]
-        rise = rise_ft # TODO redo scalar once scaling of region is corrected on TSDC (/ 3.280839895) # convert ft to meters
+        # Both rise and run are in meters
+        rise = self.elev[iterator + 1] - self.elev[iterator]
         run = trace_utils.haversine(origin, destination)
         # Handle edge case when vehicle hasn't moved (div by zero)
         if run == 0:

@@ -97,8 +97,8 @@ class Region(object):
         self.elev_data = self.raster_data[7]
         print('Generating elevation DataFrame...')
         data = self.elev_data.ReadAsArray()
-        elev = pd.DataFrame(data=data, index=self.lat_array, columns=self.lon_array)
-        self.elev = elev # TODO scalar not working on TSDC( * 3.280839895) # converts DF from meters to feet
+        # Resulting DataFrame in meters
+        self.elev = pd.DataFrame(data=data, index=self.lat_array, columns=self.lon_array)
 
     def lat_index(self, lat):
         nearest_lat_index = region_utils.find_nearest(self.lat_array, lat)
