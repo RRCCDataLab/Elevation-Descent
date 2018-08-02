@@ -14,9 +14,9 @@ import gdal
 import numpy as np
 import region_utils
 import config
-import sys
+#import sys
 # NOTE point the path below at your gdal installation (gdal_merge.py)
-sys.path.append(config.GDAL_CONFIG['path_to_gdal_merge'])
+#sys.path.append(config.GDAL_CONFIG['path_to_gdal_merge'])
 import gdal_merge
 
 # TODO: add get_path functionality to allow different 1m data tiles to be retrieved
