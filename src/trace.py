@@ -50,7 +50,7 @@ class Trace(region.Region):
         origin = self.coords[iterator]
         destination = self.coords[iterator + 1]
         rise_ft = self.elev[iterator + 1] - self.elev[iterator]
-        rise = rise_ft / 3.280839895 # convert ft to meters
+        rise = rise_ft # TODO redo scalar once scaling of region is corrected on TSDC (/ 3.280839895) # convert ft to meters
         run = trace_utils.haversine(origin, destination)
         # Handle edge case when vehicle hasn't moved (div by zero)
         if run == 0:
