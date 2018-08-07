@@ -28,9 +28,21 @@ def write_tbl_with_grade(schema_name, table_name, sample_num, veh_num):
     # Write new table to the database
     to_sql(df, schema_name, table_name+'_bilinCK')
 
+def query(query_str):
+    return pd.read_sql(query_str, SQLengine)
+
 def get_veh_tbl_df(schema_name, table_name, sample_num, veh_num):
     query = get_query_str(schema_name, table_name, sample_num, veh_num)
     return pd.read_sql(query, SQLengine)
+
+def get_both_grade(schema_name, table_name, sample_num, veh_num):
+    query = '''\
+SELECT tt_grade AS tomtom, bilin_grade as bilinear
+FROM %s.%s
+WHERE sampno = %i AND vehno = %i AND grdsrc1 = TRUE\
+        ''' % (schema_name, table_name, sample_num, veh_num)
+    df = pd.read_sql(query, SQLengine)
+    return list(df['tomtom']), list(df['bilinear'])
 
 def get_query_str(schema_name, table_name, sample_num, veh_num):
     SELECT = 'SELECT *, ST_Y(geom) AS lat, ST_X(geom) AS lon'
