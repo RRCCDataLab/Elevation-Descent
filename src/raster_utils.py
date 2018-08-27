@@ -160,15 +160,17 @@ def return_elevation_profiles(lats, lons):
 def merge_rasters(grid_refs, raster_paths):
     print('Finding multiple raster files...')
     # Get file name for storage of raster files
-    txt_filename = name_raster_file(grid_refs, filetype='txt')
+    merged_filename_txt = name_raster_file(grid_refs, filetype='txt')
     # Store the location of all the raster files to be merged
-    rasterfiles_to_txt(grid_refs, raster_paths, path_to_raster_data + txt_filename)
+    merged_raster_path_txt = path.join(path_to_raster_data, merged_filename_txt)
+    rasterfiles_to_txt(grid_refs, raster_paths, merged_raster_path_txt)
     # Get file name for the merged raster file
-    merged_filename = name_raster_file(grid_refs, filetype='adf')
+    merged_filename_adf = name_raster_file(grid_refs, filetype='adf')
     # Merge the raster files; gdal_merge parses args starting at 1
     print('Merging multiple raster files...')
-    gdal_merge.main(['', '-o', path_to_raster_data + merged_filename, '-v', '--optfile',
-                    path_to_raster_data + txt_filename ])
+    merged_raster_path_adf = path.join(path_to_raster_data, merged_filename_adf)
+    gdal_merge.main(['', '-o', merged_raster_path_adf, '-v', '--optfile',
+                    merged_raster_path_txt ])
 
 def rasterfiles_to_txt(grid_refs, raster_paths, filename):
     f = open(filename, 'w')
