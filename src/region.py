@@ -30,7 +30,7 @@ class Region(object):
 
             # if lats (and lons) is a list
             # indicates child object is a Trace object
-            if isinstance(lats, list):
+            if (isinstance(lats, list) and len(lats) > 1):
                 print('Building grid reference string(s)...')
                 self.grid_refs = raster_utils.get_grid_refs(lats, lons)
 
@@ -66,7 +66,7 @@ class Region(object):
                 self.raster_data = raster_utils.get_raster_data(merged_raster_path)
 
             else:
-                single_raster_path = self.raster_paths[0]
+                single_raster_path = self.raster_path[0]
                 self.raster_data = raster_utils.get_raster_data(single_raster_path)
             
         else:
