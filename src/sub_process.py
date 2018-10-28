@@ -20,6 +20,53 @@ FROM tsdc_txdot_san_antonio.v_points_nrel
 WHERE sampno = 301137 AND vehno = 1
 """
 
+def create_engine():
+
+    '''
+    This function creates the SQL engine (connection to the Postgre server)
+    '''
+
+    # Build engine connection string
+    username = str(input('username: '))
+    password = str(input('password: '))
+    hostname = str(input('hostname: '))
+    database = str(input('database: '))
+
+    # Start the engine
+    SQLengine = sqlalchemy.create_engine(\
+        "postgresql://{usr}:{pwd}@{host}/{db}".format(usr=username,\
+                                                        pwd=password,\
+                                                        host=hostname,\
+                                                        db=database))
+
+    return SQLengine
+
+
+def batch_query(SQLengine, schema_name, table_name, first_row, last_row):
+
+
+    '''
+    This function creates the query and returns the query results,
+    with batch size according the the last two input parameters
+    '''
+
+    # Build the query (PostgreSQL language query)
+    SELECT = "SELECT *"
+    # Could also use constructs like:
+    # "SELECT column_name, column_name, column_name"
+    # or
+    # "SELECT column_name AS another_name"
+    FROM = "{schema}.{table}".format(schema=schema_name, table=table_name)
+    # Batch encodes the first and last row requested by the query
+    BATCH = "LIMIT {limit} OFFSET {offset}".format(limit=last_row - first_row,\
+                                                    offset=first_row)
+
+    # Stitch the query together
+    query = SELECT + FROM + BATCH
+
+    return pd.read_sql(query, SQLengine)
+
+
 # Primary subprocess function
 def write_tbl_with_grade(schema_name, table_name, sample_num, veh_num):
     df = get_veh_tbl_df(schema_name, table_name, sample_num, veh_num)

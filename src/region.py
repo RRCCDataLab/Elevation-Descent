@@ -11,10 +11,10 @@ import pandas as pd
 from os import path
 import raster_utils
 import region_utils
-import config
+#import config
 
 pathx47y440 = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
-path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
+#path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
 path_to_raster_data = path.join('..', 'data', 'raster_data')
 
@@ -51,8 +51,8 @@ class Region(object):
                 self.raster_path = raster_utils.get_raster_path(self.grid_refs[0])
                 print('retrieving raster data...')
                 self.raster_data = raster_utils.get_raster_data(self.raster_path)
-                
-            
+
+
             print('Retrieving raster data...')
             # Merge tiles if there are multiple
             if (len(self.grid_refs) > 1) :
@@ -68,7 +68,7 @@ class Region(object):
             else:
                 single_raster_path = self.raster_path[0]
                 self.raster_data = raster_utils.get_raster_data(single_raster_path)
-            
+
         else:
             raise Exception('invalid data source selection')
 
@@ -103,7 +103,7 @@ class Region(object):
     def lat_index(self, lat):
         nearest_lat_index = region_utils.find_nearest(self.lat_array, lat)
         # if that element is the first element
-        if nearest_lat_index == 0: 
+        if nearest_lat_index == 0:
             below_index = nearest_lat_index # below index is 0
             above_index = below_index + 1 # above index is 1
         # or else, if that element is the last element
@@ -125,7 +125,7 @@ class Region(object):
     def lon_index(self, lon):
         nearest_lon_index = region_utils.find_nearest(self.lon_array, lon)
         # if that element is the first element
-        if nearest_lon_index == 0: 
+        if nearest_lon_index == 0:
             below_index = nearest_lon_index # below index is 0
             above_index = below_index + 1 # above index is 1
         # or else, if that element is the last element

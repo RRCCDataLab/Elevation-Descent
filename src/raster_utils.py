@@ -13,18 +13,18 @@ from os import path
 import gdal
 import numpy as np
 import region_utils
-import config
+#import config
 #import sys
 # NOTE point the path below at your gdal installation (gdal_merge.py)
 #sys.path.append(config.GDAL_CONFIG['path_to_gdal_merge'])
 import gdal_merge
 
 # TODO: add get_path functionality to allow different 1m data tiles to be retrieved
-pathx47y440 = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
-path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
+#pathx47y440 = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015.img')
+#path_to_1m_data = path.join(config.CFDS_CONFIG['path_1m_data'], pathx47y440)
 
-pathx47y440_meta = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015_meta.xml')
-path_to_1m_meta = path.join(config.CFDS_CONFIG['path_1m_meta'], pathx47y440_meta)
+#pathx47y440_meta = path.join('x47y440', 'USGS_NED_one_meter_x47y440_CO_SoPlatteRiver_lot5_2013_IMG_2015_meta.xml')
+#path_to_1m_meta = path.join(config.CFDS_CONFIG['path_1m_meta'], pathx47y440_meta)
 
 path_to_raster_data = path.join('..', 'data', 'raster_data')
 
